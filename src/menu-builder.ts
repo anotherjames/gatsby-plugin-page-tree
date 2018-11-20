@@ -7,7 +7,7 @@ class TreeNode {
     children: Array<TreeNode>
 }
 
-const normalizePath = (p: string) => {
+export const normalizePath = (p: string) => {
     if(p.endsWith('/'))  {
         p = p.substr(0, p.length - 1);
     }

@@ -4,7 +4,7 @@ const treeify_paths_1 = require("treeify-paths");
 const menu_item_1 = require("./menu-item");
 class TreeNode {
 }
-const normalizePath = (p) => {
+exports.normalizePath = (p) => {
     if (p.endsWith('/')) {
         p = p.substr(0, p.length - 1);
     }
@@ -14,14 +14,14 @@ const normalizePath = (p) => {
     return p;
 };
 function buildMenuFromNodes(nodes, selectedPath, ignorePaths) {
-    selectedPath = normalizePath(selectedPath);
+    selectedPath = exports.normalizePath(selectedPath);
     let pages = nodes.filter(x => x.internal.type == 'SitePage');
     if (!ignorePaths) {
         ignorePaths = [];
     }
-    ignorePaths = ignorePaths.map(normalizePath);
+    ignorePaths = ignorePaths.map(exports.normalizePath);
     let treePaths = pages
-        .map(x => normalizePath(x.path))
+        .map(x => exports.normalizePath(x.path))
         .filter(x => x !== '/')
         .filter(x => {
         return ignorePaths.findIndex(ignorePath => ignorePath == x) == -1;
@@ -30,10 +30,10 @@ function buildMenuFromNodes(nodes, selectedPath, ignorePaths) {
     let rootNode = tree.children[0];
     let result = [];
     const walkTreeNode = (node, parents) => {
-        let normalizedPath = normalizePath(node.path);
+        let normalizedPath = exports.normalizePath(node.path);
         let menuItem = new menu_item_1.default();
         menuItem.path = normalizedPath;
-        let page = pages.find(x => normalizePath(x.path) == normalizedPath);
+        let page = pages.find(x => exports.normalizePath(x.path) == normalizedPath);
         if (page) {
             menuItem.title = page.context.title;
             if (page.fields && page.fields.order) {

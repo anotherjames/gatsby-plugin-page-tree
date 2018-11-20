@@ -14,8 +14,44 @@ const fs = require("fs");
 const path = require("path");
 const menu_builder_1 = require("./menu-builder");
 const copyFile = util.promisify(fs.copyFile);
-const buildTreeForPath = (pagePath, getNodes, ignorePaths) => __awaiter(this, void 0, void 0, function* () {
-    return menu_builder_1.buildMenuFromNodes(getNodes(), pagePath, ignorePaths);
+const mergeConfiguredTree = (builtTree, configuredTree) => {
+    const mergedTree = [];
+    // The built tree needs to match the order of the configured tree, and
+    // contain any titles that has.
+    const builtPaths = [];
+    for (const builtItem of builtTree) {
+        builtPaths.push(builtItem.path);
+    }
+    const configuredPaths = [];
+    for (const configuredItem of configuredTree) {
+        let i = builtPaths.indexOf(menu_builder_1.normalizePath(configuredItem.path));
+        // Only need to consider things in the configured tree that actually
+        // exist in the built tree.
+        if (i !== -1) {
+            configuredPaths.push(builtTree[i].path);
+            if (configuredItem.title) {
+                builtTree[i].title = configuredItem.title;
+            }
+            mergedTree.push(builtTree[i]);
+            // Traverse children.
+            if (builtTree[i].children && builtTree[i].children.length > 0) {
+                builtTree[i].children = mergeConfiguredTree(builtTree[i].children, configuredItem.children);
+            }
+        }
+    }
+    // Add remaining (unconfigured) paths of this level to the tree. No need to
+    // traverse deeper here, because configured child items can only exist if
+    // their parents are configured.
+    for (const builtItem of builtTree) {
+        if (configuredPaths.indexOf(builtItem.path) === -1) {
+            mergedTree.push(builtItem);
+        }
+    }
+    return mergedTree;
+};
+const buildTreeForPath = (pagePath, getNodes, ignorePaths, configuredTree) => __awaiter(this, void 0, void 0, function* () {
+    const built = menu_builder_1.buildMenuFromNodes(getNodes(), pagePath, ignorePaths);
+    return mergeConfiguredTree(built, configuredTree);
 });
 exports.setFieldsOnGraphQLNodeType = ({ type, getNodes }, pluginOptions) => __awaiter(this, void 0, void 0, function* () {
     if (!pluginOptions.ignorePaths) {
@@ -23,6 +59,9 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNodes }, pluginOptions) => __aw
             '/404',
             '/dev-404-page'
         ];
+    }
+    if (!pluginOptions.tree) {
+        pluginOptions.tree = [];
     }
     if (type.name === 'SitePage') {
         return {
@@ -34,7 +73,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNodes }, pluginOptions) => __aw
                     }
                 }),
                 resolve: (node) => {
-                    return buildTreeForPath(node.path, getNodes, pluginOptions.ignorePaths);
+                    return buildTreeForPath(node.path, getNodes, pluginOptions.ignorePaths, pluginOptions.tree);
                 }
             },
             order: {

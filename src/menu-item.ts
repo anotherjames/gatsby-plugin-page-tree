@@ -1,4 +1,4 @@
-export default class MenuItem {
+export default class MenuItem implements MenuItemInterface {
     constructor() {
         this.order = 0;
         this.path = "";
