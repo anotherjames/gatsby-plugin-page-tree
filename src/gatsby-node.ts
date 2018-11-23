@@ -60,9 +60,6 @@ export const setFieldsOnGraphQLNodeType = async({ type, getNodes }: {type: any, 
             '/dev-404-page'
         ];
     }
-    if(!pluginOptions.tree) {
-        pluginOptions.tree = [];
-    }
 
     if (type.name === 'SitePage') {
         return {
@@ -74,7 +71,8 @@ export const setFieldsOnGraphQLNodeType = async({ type, getNodes }: {type: any, 
                     }
                 }),
                 resolve: (node: GatsbyNode) => {
-                    return buildTreeForPath(node.path, getNodes, pluginOptions.ignorePaths, pluginOptions.tree);
+                    const tree = node.context.tree || pluginOptions.tree || [];
+                    return buildTreeForPath(node.path, getNodes, pluginOptions.ignorePaths, tree);
                 }
             },
             order: {

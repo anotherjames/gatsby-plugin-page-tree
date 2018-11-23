@@ -3,6 +3,7 @@ interface GatsbyNode {
     path: string
     context: {
         title: string
+        tree: Array<MenuItemInterface>
     }
     internal: {
         type: string

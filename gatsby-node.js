@@ -60,9 +60,6 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNodes }, pluginOptions) => __aw
             '/dev-404-page'
         ];
     }
-    if (!pluginOptions.tree) {
-        pluginOptions.tree = [];
-    }
     if (type.name === 'SitePage') {
         return {
             menu: {
@@ -73,7 +70,8 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNodes }, pluginOptions) => __aw
                     }
                 }),
                 resolve: (node) => {
-                    return buildTreeForPath(node.path, getNodes, pluginOptions.ignorePaths, pluginOptions.tree);
+                    const tree = node.context.tree || pluginOptions.tree || [];
+                    return buildTreeForPath(node.path, getNodes, pluginOptions.ignorePaths, tree);
                 }
             },
             order: {
