@@ -10,6 +10,7 @@
         "build:watch": "tsc -p ./tsconfig.json -d -w"
     },
     "devDependencies": {
+        "@types/node": "^10.12.17",
         "gatsby": "^2.0.52",
         "tsc": "^1.20150623.0",
         "typescript": "^3.1.6"
