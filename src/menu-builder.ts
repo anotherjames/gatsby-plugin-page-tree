@@ -90,24 +90,5 @@ export function buildMenuFromNodes(nodes: Array<GatsbyNode>, selectedPath: strin
         item.children = sortChildren(item.children);
     }
 
-    // Now that we built the entire tree, let's remove the nodes that don't matter.
-    const collapseChildren = (item: MenuItem) => {
-        // We only want to consider collapsing children if this current node can be selected.
-        // If it isn't a valid page, then the user can't navigate to it to see it's children.
-        if(!item.isEmptyParent) {
-            // Collapse children if this node isn't in the active selected path.
-            if(!item.active && !item.selected) {
-                item.children = [];
-            }
-        }
-        for(let child of item.children) {
-            collapseChildren(child);
-        }
-    };
-
-    for(let child of result) {
-        collapseChildren(child);
-    }
-
     return result;
 }
